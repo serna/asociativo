@@ -1,0 +1,13 @@
+Particles(N): 125
+T*: 1.000000
+RHO: 0.611200
+lb: 1.000000E-03
+DISPL: 1.611328E-02
+NMOVE: 25000000
+NSUB: 625
+Load_prev_conf: 1
+Source_file: final_conf.dat
+DISPLONESITE: 2.075195E-01
+rc: 4.000000E-01
+rd: 3.535007E-01
+epsilon: 7.000000E+00

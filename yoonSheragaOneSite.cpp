@@ -85,10 +85,10 @@ int main(int argc, char* argv[]){
 	tot_E = total_energyOneSite();
 	prevEnergy = tot_E;
 	printf("\nInitial energy: %lf",tot_E/N);
-	save_confOneSite("initial_conf.dat");
+	save_confOneSite("initial_conf.dat","");
 	movsAcc=0.0;
 	// Printing label current progress
-	printf("\nDone\tEnergy\t\tPartial Acc\tAcceptance\tDISPL\t\tDISPONESITE\tSecs\tMeanMonom\tCurrentMonome");
+	printf("\nDone\tEnergy\t\tPartial Acc\tAcceptance\tDISPL\t\tDISPONESITE\tSecs\tmean_x\tcurrent_X");
 	double auxCnt1=0;
 				// of the hard sphere, DIST define the distance in sigmas.
 	double cntMonomer=0.0,currentMonomers=0.0;
@@ -96,15 +96,15 @@ int main(int argc, char* argv[]){
 	int oldLabel;
 	for(int i=0;i<NMOVE;i++){
 		n = (int)(ran2(pseed)*(N-1)); // choose a particle randomly
-		oldx=x[n];//save old coordinates
-		oldy=y[n];
-		oldz=z[n];
+		oldx = x[n];//save old coordinates
+		oldy = y[n];
+		oldz = z[n];
 		oldxs = xs[n]; // Save coordinates of the sites
 		oldys = ys[n];
 		oldzs = zs[n];
 		oldLabel = label[n];
 		
-		oldE=energy_due_particleOneSiteOLD(n);
+		oldE = energy_due_particleOneSiteOLD(n);
 		oldFreeE = freeEnergyDueParticle(n)/(2.0);
 		/*if(oldE>0){
 			printf("\nAlgo raro paso aquiiiii%d %lf",i,oldE);
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]){
 		//newE=energy_due_particleOneSite(n);			
 		move_particleOneSite(n,moveSiteAndParticle);
 		newFreeE = freeEnergyDueParticle(n)/(2.0);			
-		newE=energy_due_particleOneSiteNEW(n);			
+		newE = energy_due_particleOneSiteNEW(n);			
 		/*if(n==93 && newE>0){
 			printf("\nAlgo raro paso aqui1 %d %lf",i,newE);
 			temp = energy_due_particleOneSite1(n);
@@ -187,7 +187,7 @@ int main(int argc, char* argv[]){
 			time(&end_t);
 			seconds=difftime(end_t,start_t); 
 			partialAcc = (movsAcc-prevMovsAcc)/(i-auxCnt1);
-			printf("\n%1.1f\t%E\t%E\t%E\t%E\t%E\t%1.2f\t%1.3E\t%1.3E",perc,tot_E/((double)N*nMeasures),partialAcc,currentAcc,DISPL,DISPLONESITE,seconds,cntMonomer/((double)N*nMeasures),currentMonomers);
+			printf("\n%1.1f\t%E\t%E\t%E\t%E\t%E\t%1.2f\t%1.3E\t%1.3E",perc,tot_E/((double)N*nMeasures),partialAcc,currentAcc,DISPL,DISPLONESITE,seconds,cntMonomer/((double)N*nMeasures),currentMonomers/N);
 			if((int)perc%5	== 0 && load_prev == 0 ){ 
 				if (moveSiteAndParticle=='0'){
 					DISPL = betterDISPLOneSite(DISPL,i+1,movsAcc,0.63);
@@ -198,6 +198,7 @@ int main(int argc, char* argv[]){
 			auxCnt1 = i;
 			prevMovsAcc = movsAcc; 
 			saveStatus(perc,tot_E/((double)N*nMeasures),seconds);
+			save_confOneSite("final_conf.dat","");
 		}
 		
 	}
@@ -205,6 +206,6 @@ int main(int argc, char* argv[]){
 		updateDISPLOneSite(DISPL,DISPLONESITE); // change the settings.dat file, assume the next run of the program will use the 
 	}						// optimized value of DISPL and change load_prev_conf flag value to 1 in case of a 
 	cout<<endl;         	// pre-programmed run is scheduled	
-	save_confOneSite("final_conf.dat");
+	save_confOneSite("final_conf.dat","Salvando configuracion final");
 	return 0;			
 }

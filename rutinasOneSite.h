@@ -16,6 +16,7 @@ using namespace std;
 
 double potential_energy(double);
 double potential_energyOneSite(double);
+double distance2OneSite(int,int);
 /****************************************************
 *			Declaration of all variables			*
 *****************************************************/
@@ -304,11 +305,13 @@ void save_conf(string file_name){
 	}while(n<N);
 	fclose(fp);
 }
-void save_confOneSite(string file_name){
+void save_confOneSite(string file_name,string msg){
 	int n=0;
 	FILE *fp;
 	fp = fopen(file_name.c_str(),"w");
-	print_label("Saving configuration file: " + file_name );
+	if(msg!=""){
+		print_label("Saving configuration file: " + file_name );
+	}
 	fprintf(fp,"# x\t\ty\t\tz\t configuration saved for N: %d",N);
 	do{ // setting the position of each particle
 		
@@ -352,6 +355,51 @@ void move_particle(int n){
 	y[n]=newy;
 	z[n]=newz;
 }
+
+void DoSiteOverlap(int n){
+	/** This function check if site of parDoSiteOverlapicle n overlaps with another
+		Care must be taken in this function, when the site n moves several scenarios are possible
+		1.- The site n was not overlaped in the previous step, after movement
+			* The site n overlaps with a not overlaped site
+			* The site n overlaps with an overlaped site
+			* The site n does not overlap any other site
+		2.- The site n was previously overlaped in the previous step, after movement.
+			* The site n overlaps a not overlaped site
+			* The site n overlaps an overlaped site
+			* The site n does not overlap any other site
+	 **/
+	
+	double rr;
+	if(label[n]==-1){// site n was not previosuly overlapped
+		for(int i=0;i<N;i++){
+			if(n!=i){
+				rr = distance2OneSite(i,n);
+				if(rr<RC2 && label[i]==-1){ // *The site n overlaps with a not overlaped site
+					label[n] = i; // Change label to indicate this sites are overlaped
+					label[i] = n;
+// 					return 0;
+				}
+			}
+		}
+	}else{// site n was previously overlapped
+		rr = distance2OneSite(n,label[n]);
+		if(rr<RC2){// if the site n remains overlaped with is previously overlapped site then do nothing
+// 			return 0;
+		}
+		label[label[n]] = -1; // since the distance among site n and site label[n] is greater than RC, then site label[n] now is not overlaped
+		label[n]=-1; // asumme in the movement site n change from to be overlaped with site label[n] to be not overlaped to any other site
+		/** Now check if site n do end overlaped to a different site **/
+		for(int i=0;i<N;i++){
+			if(n!=i and n!=label[n]){
+				rr = distance2OneSite(i,n);
+				if(rr<RC2 && label[i]==-1){ // *The site n overlaps with a not overlaped site
+					label[n] = i; // Change label to indicate this sites are overlaped
+					label[i] = n;
+				}
+			}
+		}	
+	}
+}
 void move_particleOneSite(int n,int moveSiteAndParticle){
 	// if moveSiteAndParticle =0 then only move the particle but not the site
 	double displx,disply,displz;
@@ -375,8 +423,10 @@ void move_particleOneSite(int n,int moveSiteAndParticle){
 		xs[n] = newx/norma;
 		ys[n] = newy/norma;
 		zs[n] = newz/norma;
+		/* Check if site n overlaps with another site*/
+		DoSiteOverlap(n); // check that wituation happens, and upgrade the labels coordinate
+		
 	}
-	
 }
 double distance2(int i, int j){
 	//return the distance between particle i and j to the square
@@ -405,7 +455,7 @@ double distance2(int i, int j){
 	return (xx+yy+zz);
 }
 double distance2OneSite(int i, int j){
-	//return the distance between site od particle i and j to the square
+	//return the distance between site of particle i and j to the square
 	double xx,yy,zz,xsi,xsj,ysi,ysj,zsi,zsj;
 	xsi = x[i]+xs[i]*DIST; // DIST is given in sigmas
 	xsj = x[j]+xs[j]*DIST;
@@ -446,9 +496,10 @@ double energy_due_particle(int n){
 	}
 	return energy;
 }
+
+
 int checkAnotherOverlap(int n,int j){
 	// this function verifies if the site n has an overlap without taking into account the site j
-	int ans = 0;
 	double rr;
 	for(int i=0;i<N;i++){
 		if(n!=i && j!=i){
@@ -462,40 +513,16 @@ int checkAnotherOverlap(int n,int j){
 	return 0;
 }
 double energy_due_particleOneSiteOLD(int n){
-	double rr;
-	for(int i=0;i<N;i++){
-		if(n!=i){
-			rr = distance2OneSite(i,n);	//Potential energy due to site-site interaction
-			if(rr<RC2){ // if site n has an overlap with site i 
-				if(checkAnotherOverlap(i,n)==1){// chek if the particle i was already overlaped, if so,
-								// then the energy actual due to site n has to be zero, because otherway there will exist multiple overlaps
-					return 0.0; // on the same site
-				}else{			// But if site i does not have another overlap, then 
-					return potential_energyOneSite(rr); //  take into account 
-				}	// the energy contribution of the overlap of particle i with n
-			}
-		}
+	if(label[n]!=-1){ 
+		return potential_energyOneSite(0.0); // if label != -1 it is overlapped
 	}
-	return 0.0;
+	return 0.0; // if label==-1 it is not overlpped
 }
 double energy_due_particleOneSiteNEW(int n){
-	double rr;
-	for(int i=0;i<N;i++){
-		if(n!=i){
-			rr = distance2OneSite(i,n);	//Potential energy due to site-site interaction
-			if(rr<RC2){ // if site n has an overlap with site i because of the movement of n
-				if(checkAnotherOverlap(i,n)==1){// if the particle i was already overlaped with another site different of site n
-					return 0.0; // then the movement and overlap of n with i does not bring a contribution energy
-				}else{	// if the particle i was not overlaped to anything else, then take into account the contribution energy of overlap n,i
-						// take into account that the movement of site n could lead to an overlap of n with another site different 
-						// of overlap with site i, let say to overlap the site j (i an j are not overlaped), but only the energy of overlap n,j
-						// is taken into account.
-					return potential_energyOneSite(rr); 
-				}	
-			}
-		}
+	if(label[n]!=-1){ 
+		return potential_energyOneSite(0.0); // if label != -1 it is overlapped
 	}
-	return 0.0;
+	return 0.0; // if label==-1 it is not overlpped
 }
 double energy_due_particleOneSite1(int n){
 	double rr,energy=0.0;
@@ -613,19 +640,10 @@ double freeEnergyDueParticleCavityFunction(int n){
 	return -log(prod);
 }
 double countMonomers(){
-	double isMonomer,cnt=0.0,rr;
+	double cnt=0.0;
 	for(int n=0;n<N;n++){
-		isMonomer = 1; // assume the particle n is a monomer
-		for(int i=0;i<N;i++){
-			if(n!=i){
-				rr = distance2OneSite(i,n);	//Potential energy due to site-site interaction
-				if(potential_energyOneSite(rr)<0){// then this is not a monomer
-					isMonomer = 0;
-					break;
-				}
-			}
-		}
-		cnt+=isMonomer;
+		if(label[n]==-1)
+			cnt++;
 	}
 	return cnt;
 }
