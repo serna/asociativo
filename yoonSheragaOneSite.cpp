@@ -95,7 +95,9 @@ int main(int argc, char* argv[]){
 	float seconds,temp;
 	int oldLabel;
 	for(int i=0;i<NMOVE;i++){
+		
 		n = (int)(ran2(pseed)*(N-1)); // choose a particle randomly
+// 		printf("\n-- Moving site %d step %d",n,i);
 		oldx = x[n];//save old coordinates
 		oldy = y[n];
 		oldz = z[n];
@@ -103,7 +105,6 @@ int main(int argc, char* argv[]){
 		oldys = ys[n];
 		oldzs = zs[n];
 		oldLabel = label[n];
-		
 		oldE = energy_due_particleOneSiteOLD(n);
 		oldFreeE = freeEnergyDueParticle(n)/(2.0);
 		/*if(oldE>0){
@@ -152,7 +153,7 @@ int main(int argc, char* argv[]){
 					printf("\nrejected %lf %lf %d %lf %lf",newFreeE-oldFreeE, newE-oldE,i,newE,oldE);
 					getchar();
 				}*/
-		//		printf("\nREJECTED");
+// 				printf(" REJECTED");
 				x[n]=oldx;
 				y[n]=oldy;
 				z[n]=oldz;
@@ -160,6 +161,16 @@ int main(int argc, char* argv[]){
 				ys[n] = oldys;
 				zs[n] = oldzs;
 				label[n] = oldLabel;
+				if(label_i_changed!=-1){
+// 					printf(" label %d has the value %d and will be restored to the value %d",label_i_changed, label[label_i_changed], previous_val_label_i);
+					label[label_i_changed] = previous_val_label_i;
+				}
+				
+				if(label_j_changed!=-1){
+// 					printf(" label %d has the value %d and will be restored to the value %d",label_j_changed, label[label_j_changed], previous_val_label_j);
+					label[label_j_changed] = previous_val_label_j;
+				}
+// 				printf("\n-- Site %d have the label %d ",n,label[n]);
 			}
 		}
 		
@@ -178,8 +189,10 @@ int main(int argc, char* argv[]){
 		}
 		if((i+1)%(NMOVE/100)==0){
 			perc++;
-			if (perc>50)
+			if (perc>50){
 				moveSiteAndParticle='1';
+// 				getchar();
+			}
 			/*if (perc>=55)
 				getchar();*/
 			

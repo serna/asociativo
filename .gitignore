@@ -6,4 +6,4 @@ runAll.sh
 *.sh
 *.txt
 settings.pyc
-
+.**/
