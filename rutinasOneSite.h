@@ -665,8 +665,9 @@ double freeEnergyDueParticleCavityFunction(int n){
 double countMonomers(){
 	double cnt=0.0;
 	for(int n=0;n<N;n++){
-		if(label[n]==-1)
+		if(label[n]==-1){
 			cnt++;
+		}
 	}
 	return cnt;
 }

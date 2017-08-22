@@ -45,7 +45,11 @@ double potential_energyOneSite(double rr){
 	//energy = energy + 0.00097632; // potential shift*/
 	return energy;
 }
-
+void printConf(){
+	for(int n=0;n<N;n++){
+		printf("\n%E\t%E\t%E\t%E\t%E\t%E\t%d",x[n],y[n],z[n],xs[n],ys[n],zs[n],label[n]);
+	}
+}
 			
 int main(int argc, char* argv[]){
 	PI = acos(-1.0);
@@ -94,10 +98,16 @@ int main(int argc, char* argv[]){
 	double cntMonomer=0.0,currentMonomers=0.0;
 	float seconds,temp;
 	int oldLabel;
+	label_j_changed = -1;
+	label_i_changed = -1;
 	for(int i=0;i<NMOVE;i++){
 		
 		n = (int)(ran2(pseed)*(N-1)); // choose a particle randomly
-// 		printf("\n-- Moving site %d step %d",n,i);
+		if(label[0]==0){
+			printf("\n-- Moving site %d step %d",n,i);
+			printConf();
+			getchar();
+		}
 		oldx = x[n];//save old coordinates
 		oldy = y[n];
 		oldz = z[n];
@@ -162,12 +172,12 @@ int main(int argc, char* argv[]){
 				zs[n] = oldzs;
 				label[n] = oldLabel;
 				if(label_i_changed!=-1){
-// 					printf(" label %d has the value %d and will be restored to the value %d",label_i_changed, label[label_i_changed], previous_val_label_i);
+// 					printf(" i: label %d has the value %d and will be restored to the value %d",label_i_changed, label[label_i_changed], previous_val_label_i);
 					label[label_i_changed] = previous_val_label_i;
 				}
 				
 				if(label_j_changed!=-1){
-// 					printf(" label %d has the value %d and will be restored to the value %d",label_j_changed, label[label_j_changed], previous_val_label_j);
+// 					printf(" j: label %d has the value %d and will be restored to the value %d",label_j_changed, label[label_j_changed], previous_val_label_j);
 					label[label_j_changed] = previous_val_label_j;
 				}
 // 				printf("\n-- Site %d have the label %d ",n,label[n]);
