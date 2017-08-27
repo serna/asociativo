@@ -4,6 +4,7 @@ import sys
 import os # for operations in the OS
 import os.path
 import time
+import numpy as np
 def mkdir(dir_name):
     """ Creates a directory named 'dir_name' """
     try:
@@ -307,9 +308,11 @@ elif sys.argv[1]=="-getInfo":
 			ff.readline()
 			line = ff.readline()
 			doneHere = line.split()[0]
+			computeUncertainty = True
 			if int(line.split()[0])!=100:
 				lista.append(currentDir)
 				missingSim += 1
+				computeUncertainty = False
 			ff.close()
 			ff=open(currentDir+"/out.txt","r")
 			fechaMod = os.path.getmtime(os.path.join(currentDir, "out.txt"))
@@ -317,17 +320,36 @@ elif sys.argv[1]=="-getInfo":
 			lineFinal1 = "" # the line previous to the final line
 			lineFinal2 = "" # the line previous to lineFinal1
 			finalLine = "" # the last line
+			cnt = 0
 			for line in ff:
 				lineFinal2 = lineFinal1
 				lineFinal1 = finalLine
 				finalLine = line
+				cnt++
+			ff.close()
 			N,T,RHO,lb, rc, rd, eps = breakDir(currentDir)
 			if len(lineFinal2.split())>7:
-				info = "\n{0}\t{1}\t{2}\t{3}\t{4}  \t{5}\t{6}\t{7}".format(N,T,RHO,lb, rc, rd, eps,lineFinal2.split()[7])
+				if computeUncertainty==True:
+					ff=open(currentDir+"/out.txt","r")
+					cnt1 = 0
+					sumx = 0.0
+					sumx2 = 0.0
+					for line in ff:
+						cnt1++
+						if cnt1>=cnt-103:
+							val = line.split()[7]
+							sumx += val
+							sumx2 += val*val
+					sigma = np.sqrt(sumx2/100.0-sumx*sumx/10000.0)
+					ff.close()
+					info = "\n{0}\t{1}\t{2}\t{3}\t{4}  \t{5}\t{6}\t{7}\t{8}".format(N,T,RHO,lb, rc, rd, eps,lineFinal2.split()[7],sigma)
+					
+				else:
+					info = "\n{0}\t{1}\t{2}\t{3}\t{4}  \t{5}\t{6}\t{7}".format(N,T,RHO,lb, rc, rd, eps,lineFinal2.split()[7])
 				print cnt,doneHere, info[1:],fechaMod
 				gg.write(info)
 			cnt +=1
-			ff.close()
+			
 
 	gg.close()
 	print "There are missing ",missingSim , " simulation"
