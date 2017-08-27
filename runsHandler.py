@@ -325,7 +325,7 @@ elif sys.argv[1]=="-getInfo":
 				lineFinal2 = lineFinal1
 				lineFinal1 = finalLine
 				finalLine = line
-				cnt++
+				cnt+=1
 			ff.close()
 			N,T,RHO,lb, rc, rd, eps = breakDir(currentDir)
 			if len(lineFinal2.split())>7:
@@ -335,9 +335,10 @@ elif sys.argv[1]=="-getInfo":
 					sumx = 0.0
 					sumx2 = 0.0
 					for line in ff:
-						cnt1++
-						if cnt1>=cnt-103:
-							val = line.split()[7]
+						cnt1+=1
+						if cnt1>=cnt-101 and cnt1<cnt-1:
+							#print line
+							val = float(line.split()[7])
 							sumx += val
 							sumx2 += val*val
 					sigma = np.sqrt(sumx2/100.0-sumx*sumx/10000.0)
