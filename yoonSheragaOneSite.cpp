@@ -12,7 +12,25 @@ using namespace std;
 /****************************************************
 *		Declaration of the potential energy		*
 *****************************************************/
-
+void checkEverthingOK(int step){
+	for(int i=0;i<N;i++){
+		if(label[i]!=-1){
+			if(i!=label[label[i]]){
+				printf("\nAqui ocurrio un error, en el paso %d",step);
+				printf("\n particle i: %d label[label[i]]: %d ",i,label[label[i]]);
+				//printf("label[]")
+				save_confOneSite("final_conf.dat","");
+				getchar();
+			}
+		}
+	}
+}
+void printConfiguration(){
+	for(int i=0;i<N;i++){
+		printf("\n%lf\t%lf\t%lf\t%d",x[i],y[i],z[i],label[i]);
+	}
+	printf("\n");
+}
 double potential_energy(double rr){
 	//Here is the definition of the interation potential
 	double energy=0.0;
@@ -100,14 +118,13 @@ int main(int argc, char* argv[]){
 	int oldLabel;
 	label_j_changed = -1;
 	label_i_changed = -1;
+	int stepIndex = 255867;
 	for(int i=0;i<NMOVE;i++){
 		
-		n = (int)(ran2(pseed)*(N-1)); // choose a particle randomly
-		if(label[0]==0){
-			printf("\n-- Moving site %d step %d",n,i);
-			printConf();
-			getchar();
-		}
+		n = (int)(ran2(pseed)*(N)); // choose a particle randomly
+		/*if(i>stepIndex){
+			printf("\nThe particle moving is %d, old coordinates %lf %lf %lf %d",n,x[n],y[n],z[n],label[n]);
+		}//*/
 		oldx = x[n];//save old coordinates
 		oldy = y[n];
 		oldz = z[n];
@@ -117,16 +134,19 @@ int main(int argc, char* argv[]){
 		oldLabel = label[n];
 		oldE = energy_due_particleOneSiteOLD(n);
 		oldFreeE = freeEnergyDueParticle(n)/(2.0);
-		/*if(oldE>0){
+		/*if(i>255867){
 			printf("\nAlgo raro paso aquiiiii%d %lf",i,oldE);
-			//printf("\nCoordinates %d %lf %lf %lf",i,x[i],y[i],z[i]);
-			//printf("\nCoordinates of %d %lf %lf %lf %lf %lf %lf %lf",i,x[i],y[i],z[i],x[i]+xs[i]*DIST,y[i]+ys[i]*DIST,z[i]+zs[i]*DIST,oldE);
+			printf("\nCoordinates %d %lf %lf %lf",i,x[i],y[i],z[i]);
+			printf("\nCoordinates of %d %lf %lf %lf %lf %lf %lf %lf",i,x[i],y[i],z[i],x[i]+xs[i]*DIST,y[i]+ys[i]*DIST,z[i]+zs[i]*DIST,oldE);
 			temp = energy_due_particleOneSite1(n);
 			getchar();
-		}*/
+		}//*/
 		
 		//newE=energy_due_particleOneSite(n);			
-		move_particleOneSite(n,moveSiteAndParticle);
+		move_particleOneSite(n,moveSiteAndParticle,i);
+		/*if(i>stepIndex){
+			printf("\nThe particle moving is %d, NEW coordinates %lf %lf %lf %d",n,x[n],y[n],z[n],label[n]);
+		}//*/
 		newFreeE = freeEnergyDueParticle(n)/(2.0);			
 		newE = energy_due_particleOneSiteNEW(n);			
 		/*if(n==93 && newE>0){
@@ -139,12 +159,12 @@ int main(int argc, char* argv[]){
 			energyCounter += newE-oldE; // count the increment of energy
 			freeEnergyCounter += newFreeE-oldFreeE; // count the increment of free energy
 			movsAcc++;
-			/*if(i>=110444){
+			/*if(i>255869){
 				printf("\nacepted1 %lf %lf %d %lf %lf %d",newFreeE-oldFreeE, newE-oldE,i,newE,oldE,n);
 				printf("\nLlamando a la funcio para ver que sitio se traslapo");
 				temp = energy_due_particleOneSite1(n);
 				getchar();
-			}*/
+			}//*/
 				
 		}else{
 			
@@ -152,10 +172,10 @@ int main(int argc, char* argv[]){
 				movsAcc++;
 				freeEnergyCounter += newFreeE-oldFreeE; // count the increment of energy
 				energyCounter += newE-oldE; // count the increment of energy
-				/*if(i>=110444){
+				/*if(i>255869){
 					printf("\nacepted2 %lf %lf %d %lf %lf",newFreeE-oldFreeE, newE-oldE,i,newE,oldE);
 					getchar();
-				}*/	
+				}///*/	
 		//		printf("\nACCEPTED2");
 			}
 			else{
@@ -183,7 +203,11 @@ int main(int argc, char* argv[]){
 // 				printf("\n-- Site %d have the label %d ",n,label[n]);
 			}
 		}
-		
+		/*if(i>stepIndex){
+			printConfiguration();
+		}
+		checkEverthingOK(i);
+		//*/
 		//getchar();
 		if(i%NSUB==0){
 			// Taking averages

@@ -357,7 +357,7 @@ void move_particle(int n){
 	z[n]=newz;
 }
 
-int DoSiteOverlap(int n){
+int DoSiteOverlap(int n,int step){
 	/** This function check if site of parDoSiteOverlapicle n overlaps with another
 		Care must be taken in this function, when the site n moves several scenarios are possible
 		1.- The site n was not overlaped in the previous step, after movement
@@ -382,7 +382,9 @@ int DoSiteOverlap(int n){
 					label_i_changed = i;
 					label[n] = i; // Change label to indicate this sites are overlaped
 					label[i] = n;
-// 					printf("\n1: Site %d overlaps with site %d, therefore the labels corresponding are %d %d ",n,i,label[n],label[label[n]]);
+					/*if(step>255867){
+						printf("\n1: Site %d overlaps with site %d, therefore the labels corresponding are %d %d ",n,i,label[n],label[label[n]]);
+					}//*/
 					
 // 					getchar();
  					return 0;
@@ -394,25 +396,34 @@ int DoSiteOverlap(int n){
 		if(rr<RC2){// if the site n remains overlaped with is previously overlapped site then do nothing
  			return 0;
 		}
-// 		printf("\n2: Site %d and site %d has the labels %d %d",n,label[n],label[n],label[label[n]]);
+		/*if(step>255867){
+	 		printf("\n Site %d and site %d has the labels %d %d",n,label[n],label[n],label[label[n]]);
+		}//*/
 		label_i_changed = label[n];
 		previous_val_label_i = label[label[n]];
 		label[label[n]] = -1; // since the distance among site n and site label[n] is greater than RC, then site label[n] now is not overlaped
-// 		printf("\n2: Site %d left the overlap with %d, therefore the labels corresponding are ",n,label[n]);
+		
+		/*if(step>255867)
+	 		printf("\n22: Site %d left the overlap with %d, therefore the labels corresponding are ",n,label[n]);
+		//*/
 		label[n]=-1;
-// 		printf("%d %d",label[n],label[label[n]]);
+		/*if(step>255867)
+			printf("%d %d deben ser -1 -1",label[n],label[previous_val_label_i]);
+		//*/
 // 		getchar();
 		//label[n]=-1; // asumme in the movement site n change from to be overlaped with site label[n] to be not overlaped to any other site
 		/** Now check if site n do end overlaped to a different site **/
 		for(int j=0;j<N;j++){
 			if(n!=j and j!=label[n]){
 				rr = distance2OneSite(j,n);
-				if(rr<RC2){ // *The site n overlaps with a not overlaped site
+				if(rr<RC2  and label[j]==-1 ){ // *The site n overlaps with a not overlaped site
 					previous_val_label_j = label[j];
 					label_j_changed = j;
 					label[n] = j; // Change label to indicate this sites are overlaped
 					label[j] = n;
-// 					printf("\n3: Site %d overlaps with site %d, therefore the labels corresponding are %d %d ",n,j,label[n],label[j]);
+					/*if(step>255867)
+						printf("\n3: Site %d overlaps with site %d, therefore the labels corresponding are %d %d ",n,j,label[n],label[j]);
+					//*/
 // 					getchar();
 					return 0;
 				}
@@ -420,7 +431,7 @@ int DoSiteOverlap(int n){
 		}	
 	}
 }
-void move_particleOneSite(int n,int moveSiteAndParticle){
+void move_particleOneSite(int n,int moveSiteAndParticle,int step){
 	/*** This function moves particle an rotate site, the two extra argunments are used to save the
 	 * previous state of the configuration, it because if the movements is rejected the configuration
 	 * must return to the initial state.
@@ -448,7 +459,7 @@ void move_particleOneSite(int n,int moveSiteAndParticle){
 		ys[n] = newy/norma;
 		zs[n] = newz/norma;
 		/* Check if site n overlaps with another site*/
-		DoSiteOverlap(n); // check that wituation happens, and upgrade the labels coordinate
+		DoSiteOverlap(n,step); // check that wituation happens, and upgrade the labels coordinate
 	}
 }
 double distance2(int i, int j){
