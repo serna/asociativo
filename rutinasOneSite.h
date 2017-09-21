@@ -598,16 +598,18 @@ double total_energy(){
 	return energy;
 }
 double total_energyOneSite(){
+	/* Compute the initial energy to the overlap of sites
+	 *
+	 * This function runs over the "coordinate" label[i], if it is equal to -1 then it is not overlaped
+	 * but if label[i]!=-1 then it is overlaped and counts for potential energy of the system.
+	 */
 	double energy=0.0,rr;
-	for(int i=0; i<(N-1);i++){
-		for(int j=i+1;j<N;j++){
-			rr = distance2(i,j);
-			energy += potential_energy(rr);	// take into account the energy due to the main spheres
-			rr = distance2OneSite(i,j);		// and also the energy due to the sites
-			energy += potential_energyOneSite(rr);
+	for(int i=0; i<N;i++){
+		if(label[i]!=-1){
+			energy += potential_energyOneSite(0.0);
 		}
 	}
-	return energy;
+	return energy/2.0;
 }
 double slaterSum(double r_ij){
 	double xi = sqrt2PI*(r_ij/S-1.0)/lb;

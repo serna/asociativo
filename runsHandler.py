@@ -294,15 +294,15 @@ elif sys.argv[1]=="-getInfo":
 	title = ("N\tT\trho\tlb\trc\t\trd\teps\tmeanXfree")
 	gg.write(title)
 	print title
-	cnt =1
+	cntGral =1
 	missingSim = 0
 	for currentDir in allDirs:
 		try:
 			ff = open(currentDir+"/status.dat","r")
 		except IOError:
-			print cnt , "Nothing to print " , currentDir +"/status.dat"	
+			print cntGral , "Nothing to print " , currentDir +"/status.dat"	
 			# if cannot open the status.dat file then there is any information about this simulation
-			cnt += 1
+			cntGral += 1
 			missingSim += 1
 		else:   # check the current status of the simulation
 			ff.readline()
@@ -347,14 +347,15 @@ elif sys.argv[1]=="-getInfo":
 					
 				else:
 					info = "\n{0}\t{1}\t{2}\t{3}\t{4}  \t{5}\t{6}\t{7}".format(N,T,RHO,lb, rc, rd, eps,lineFinal2.split()[7])
-				print cnt,doneHere, info[1:],fechaMod
+				print cntGral,doneHere, info[1:],fechaMod
 				gg.write(info)
-			cnt +=1
+			cntGral +=1
 			
 
 	gg.close()
 	print "There are missing ",missingSim , " simulation"
-	print "Assuming 2 hours for each simulation, estimated total time (hours): ", 2*missingSim, ", days:", round(2.0*missingSim/24.0/sets.nProcessors,2)
+	timePerSimulation = 2 # this time has to be in hours
+	print "Assuming 2 hours for each simulation, estimated total time (hours): ", round(timePerSimulation*missingSim/sets.nProcessors,2), ", days:", round(timePerSimulation*missingSim/24.0/sets.nProcessors,2)
 elif sys.argv[1] == "-getSummary_gr":
 	lista = dirNames() # get the list of all the directories where the study will be done
 	ff = open("files/summary_gr.dat","w")

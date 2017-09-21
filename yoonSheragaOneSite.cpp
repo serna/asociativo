@@ -177,8 +177,7 @@ int main(int argc, char* argv[]){
 					getchar();
 				}///*/	
 		//		printf("\nACCEPTED2");
-			}
-			else{
+			}else{
 				/*if(i>=110444){
 					printf("\nrejected %lf %lf %d %lf %lf",newFreeE-oldFreeE, newE-oldE,i,newE,oldE);
 					getchar();
@@ -212,6 +211,7 @@ int main(int argc, char* argv[]){
 		if(i%NSUB==0){
 			// Taking averages
 			currentEnergy = prevEnergy + energyCounter;
+			//tot_E += total_energyOneSite();
 			tot_E += currentEnergy;
 			prevEnergy = currentEnergy;
 			energyCounter=0.0;
@@ -234,7 +234,7 @@ int main(int argc, char* argv[]){
 			time(&end_t);
 			seconds=difftime(end_t,start_t); 
 			partialAcc = (movsAcc-prevMovsAcc)/(i-auxCnt1);
-			printf("\n%1.1f\t%E\t%E\t%E\t%E\t%E\t%1.2f\t%1.3E\t%1.3E",perc,tot_E/((double)N*nMeasures),partialAcc,currentAcc,DISPL,DISPLONESITE,seconds,cntMonomer/((double)N*nMeasures),currentMonomers/N);
+			printf("\n%1.1f\t%E\t%E\t%E\t%E\t%E\t%1.2f\t%E\t%E",perc,tot_E/((double)N*nMeasures),partialAcc,currentAcc,DISPL,DISPLONESITE,seconds,cntMonomer/((double)N*nMeasures),currentMonomers/N);
 			if((int)perc%5	== 0 && load_prev == 0 ){ 
 				if (moveSiteAndParticle=='0'){
 					DISPL = betterDISPLOneSite(DISPL,i+1,movsAcc,0.63);
